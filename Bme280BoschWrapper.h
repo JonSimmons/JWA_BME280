@@ -1,7 +1,8 @@
 #ifndef __BMP280_BW_H__
 #define __BMP280_BW_H__
 
-extern "C" {        
+extern "C" 
+{        
 #define __STDC_VERSION__ 201112L
 #define uint16_t unsigned short 
 #include <bme280.h>
@@ -17,6 +18,7 @@ class Bme280BoschWrapper
     Bme280BoschWrapper(bool forcedMode);
 
     bool beginI2C(u8 dev_addr = 0x77);
+	bool beginI2C(u8 dev_addr = 0x77, u8 i2c_sda = 0x2, u8 i2c_scl = 0x0);
     bool beginSPI(int8_t cspin);
 
     //this method performs measurement
@@ -53,6 +55,7 @@ class Bme280BoschWrapper
 
   private:
     void I2CInit();
+	void I2CInit(u8 i2c_sda, u8 i2c_scl);
     void SPIInit();
   
     static s8 I2CRead(u8 dev_addr, u8 reg_addr, u8 *reg_data, u8 cnt);

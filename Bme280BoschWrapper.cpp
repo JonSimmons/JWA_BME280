@@ -15,6 +15,15 @@ Bme280BoschWrapper::Bme280BoschWrapper(bool forced)
   this->forced = forced;
 }
 
+//added 5/9/17 Jon Simmons to support esp8266 
+bool Bme280BoschWrapper::beginI2C(u8 dev_addr, u8 i2c_sda, u8 i2c_scl)
+{
+  I2CInit(i2c_sda, i2c_scl);
+  bme280.dev_addr = dev_addr;
+  s8 ret = bme280_init(&bme280);
+  return (ret == SUCCESS);
+}
+
 bool Bme280BoschWrapper::beginI2C(u8 dev_addr)
 {
   I2CInit();
@@ -22,6 +31,7 @@ bool Bme280BoschWrapper::beginI2C(u8 dev_addr)
   s8 ret = bme280_init(&bme280);
   return (ret == SUCCESS);
 }
+
 
 bool Bme280BoschWrapper::beginSPI(int8_t cspin)
 {
@@ -190,6 +200,20 @@ u32 Bme280BoschWrapper::getPressurePrec()
 
 SPISettings bme280SpiSettings = SPISettings(2000000, MSBFIRST, SPI_MODE0);
 
+//updated Jon Simmons 5/9/17 to support ESP8266 compatibility
+void Bme280BoschWrapper::I2CInit(u8 i2c_sda, u8 i2c_scl) 
+{
+  bme280.bus_write = Bme280BoschWrapper::I2CWrite;
+  bme280.bus_read = Bme280BoschWrapper::I2CRead;
+  bme280.dev_addr = BME280_I2C_ADDRESS2;
+  bme280.delay_msec = Bme280BoschWrapper::delaymsec;
+
+	//Wire.begin();
+  Wire.pins(i2c_sda,i2c_scl);
+  Wire.begin(i2c_sda,i2c_scl);
+}
+
+//original
 void Bme280BoschWrapper::I2CInit() 
 {
   bme280.bus_write = Bme280BoschWrapper::I2CWrite;
@@ -198,6 +222,7 @@ void Bme280BoschWrapper::I2CInit()
   bme280.delay_msec = Bme280BoschWrapper::delaymsec;
 
   Wire.begin();
+
 }
 
 void Bme280BoschWrapper::SPIInit() 
